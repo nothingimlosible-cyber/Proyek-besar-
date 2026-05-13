@@ -368,8 +368,21 @@ export default function App() {
             : t
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Error:", error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "model",
+        content: `Error: ${error.message || "Gagal menghubungi AI. Pastikan GEMINI_API_KEY sudah diset."}`,
+        timestamp: Date.now(),
+      };
+      setThreads((prev) =>
+        prev.map((t) =>
+          t.id === activeThreadId
+            ? { ...t, messages: [...t.messages, errorMessage], updatedAt: Date.now() }
+            : t
+        )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -591,6 +604,8 @@ export default function App() {
             updateFileInProject={updateFileInProject}
             addFileToProject={addFileToProject}
             exportProject={exportProject}
+            setPreviewCode={setPreviewCode}
+            setIsPreviewOpen={setIsPreviewOpen}
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
           />
@@ -873,7 +888,7 @@ function InputBar({ input, setInput, isLoading, handleSend }: any) {
   );
 }
 
-function StudioView({ project, activeFileId, setActiveFileId, updateFileInProject, addFileToProject, exportProject, isSidebarOpen, setIsSidebarOpen }: any) {
+function StudioView({ project, activeFileId, setActiveFileId, updateFileInProject, addFileToProject, exportProject, setPreviewCode, setIsPreviewOpen, isSidebarOpen, setIsSidebarOpen }: any) {
   if (!project) return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 gap-6">
        <div className="w-24 h-24 bg-slate-200 rounded-[32px] flex items-center justify-center text-slate-400">
